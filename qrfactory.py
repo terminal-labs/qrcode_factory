@@ -51,7 +51,6 @@ background_translation = middle - logo_box_size/2 # center the background
 plot_background.moveto(background_translation, background_translation)
 
 ## Create logo plot
-#FIXME - currently no scaling. The logo could bleed out of the background box or be very small
 plot_logo = fig_logo.getroot()
 logo_translation = middle - 7*scale_factor/2 # center the logo
 # Scale to fit logo in a 7 module wide box in the center.
