@@ -1,0 +1,3 @@
+segno
+svgutils
+svgwrite

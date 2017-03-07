@@ -1,0 +1,7 @@
+*\#
+*.pyc
+*~
+venv/
+background.svg
+qrcode.svg
+qrcode_with_logo.svg
