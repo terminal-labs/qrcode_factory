@@ -54,7 +54,7 @@ plot_background.moveto(background_translation, background_translation)
 plot_logo = fig_logo.getroot()
 logo_translation = middle - 7*scale_factor/2 # center the logo
 # Scale to fit logo in a 7 module wide box in the center.
-plot_logo.moveto(logo_translation, logo_translation, scale=(7*scale_factor)/logo_size)
+plot_logo.moveto(logo_translation, logo_translation, scale=7*scale_factor/logo_size)
 
 ## Combine plots into single SVG
 fig = sg.SVGFigure(qr_size*scale_factor, qr_size*scale_factor)
