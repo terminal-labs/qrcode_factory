@@ -14,24 +14,24 @@ import segno
 import svgutils.transform as sg
 import svgwrite
 
-# Initial vars
+## Initial vars
 module_color = "#000000"
 background_color = "#2F9A41"
 scale_factor = 10 # Scale so that SVG output logo isn't pixelated.
 
-# Create base QR Code
+## Create base QR Code
 qr = segno.make('http://goo.gl/aVZvN1', micro=False, error='H')
 qr.save('qrcode.svg', color=module_color, background=background_color)
 fig_qr = sg.fromfile('qrcode.svg')
 qr_size = float(fig_qr.get_size()[0]) # only grab first size because it's a square
 middle = (qr_size*scale_factor)/2 # typically not an integer
 
-# Load image to embedd in the center
+## Load image to embed
 fig_logo = sg.fromfile('logo.svg')
-# Following line needs to be more robust for arbitrary SVGs.
+# TODO: Following line needs to be more robust for arbitrary SVGs.
 logo_size = float(fig_logo.root.get('viewBox').split()[2]) # only grab first size because it's a square
 
-# Create embedded image's solid background. It will provide a 1 module ("pixel") wide margin in all directions.
+## Create embedded image's solid background. It will provide a 1 module ("pixel") wide margin in all directions.
 logo_box_size = 9*scale_factor # must represent an odd number of modules since qr code lengths are odd modules long.
 fig_background = svgwrite.Drawing('background.svg', size=(logo_box_size, logo_box_size))
 fig_background.add(fig_background.rect(insert=(0,0), size=(logo_box_size, logo_box_size), fill=module_color))
