@@ -14,49 +14,69 @@ import segno
 import svgutils.transform as sg
 import svgwrite
 
-## Initial vars
-module_color = "#000000"
-background_color = "#2F9A41"
-scale_factor = 10 # Scale so that SVG output logo isn't pixelated.
+class QRFactory:
+    def __init__(self, module_color=None,background_color=None,scale_factor=None):
+        self.module_color = module_color if module_color is not None else "#000000"
+        self.background_color = background_color if background_color is not None else "#2F9A41"
+        self.scale_factor = scale_factor if scale_factor is not None else 10 # Scale so that SVG output logo isn't pixelated.
 
-## Create base QR Code
-qr = segno.make('http://goo.gl/aVZvN1', micro=False, error='H')
-qr.save('qrcode.svg', color=module_color, background=background_color)
-fig_qr = sg.fromfile('qrcode.svg')
-qr_size = float(fig_qr.get_size()[0]) # only grab first size because it's a square
-middle = (qr_size*scale_factor)/2 # typically not an integer
+    def input_for_encoding(self):
+        ## Create base QR Code
+        qr = segno.make('http://goo.gl/aVZvN1', micro=False, error='H')
+        qr.save('qrcode.svg', color=self.module_color, background=self.background_color)
+            # file output used here for base_qr_code
+    def base_qr_code(self):
+        self.fig_qr = sg.fromfile('qrcode.svg')
+        self.qr_size = float(self.fig_qr.get_size()[0]) # only grab first size because it's a square
+        self.middle = (self.qr_size*self.scale_factor)/2 # typically not an integer
 
-## Load image to embed
-fig_logo = sg.fromfile('logo.svg')
-# TODO: Following line needs to be more robust for arbitrary SVGs.
-logo_size = float(fig_logo.root.get('viewBox').split()[2]) # only grab first size because it's a square
+    def input_logo(self):
+        ## Load image to embed
+        self.fig_logo = sg.fromfile('logo.svg')
 
-## Create embedded image's solid background. It will provide a 1 module ("pixel") wide margin in all directions.
-logo_box_size = 9*scale_factor # must represent an odd number of modules since qr code lengths are odd modules long.
-fig_background = svgwrite.Drawing('background.svg', size=(logo_box_size, logo_box_size))
-fig_background.add(fig_background.rect(insert=(0,0), size=(logo_box_size, logo_box_size), fill=module_color))
-fig_background.save()
-fig_background = sg.fromfile('background.svg')
+    def config_logo(self):
+        # TODO: Following line needs to be more robust for arbitrary SVGs.
+        self.logo_size = float(self.fig_logo.root.get('viewBox').split()[2]) # only grab first size because it's a square
 
-### Creating plots to be combined into final SVG
-## Create QR code plot
-plot_qr = fig_qr.getroot()
-plot_qr.moveto(0, 0, scale=scale_factor)
+        ## Create embedded image's solid background. It will provide a 1 module ("pixel") wide margin in all directions.
+        self.logo_box_size = 9*self.scale_factor # must represent an odd number of modules since qr code lengths are odd modules long.
+        fig_background = svgwrite.Drawing('background.svg', size=(self.logo_box_size, self.logo_box_size))
+        fig_background.add(fig_background.rect(insert=(0,0), size=(self.logo_box_size, self.logo_box_size), fill=self.module_color))
+        fig_background.save()
+        self.fig_background = sg.fromfile('background.svg')
 
-## Create background plot
-# Create a solid background behind the logo, extending such that there
-# is one whole pixel of background in the margin around the logo
-plot_background = fig_background.getroot()
-background_translation = middle - logo_box_size/2 # center the background
-plot_background.moveto(background_translation, background_translation)
+    def create_plots(self):
+        ### Creating plots to be combined into final SVG
+        ## Create QR code plot
+        self.plot_qr = self.fig_qr.getroot()
+        self.plot_qr.moveto(0, 0, scale=self.scale_factor)
 
-## Create logo plot
-plot_logo = fig_logo.getroot()
-logo_translation = middle - 7*scale_factor/2 # center the logo
-# Scale to fit logo in a 7 module wide box in the center.
-plot_logo.moveto(logo_translation, logo_translation, scale=7*scale_factor/logo_size)
+        ## Create background plot
+        # Create a solid background behind the logo, extending such that there
+        # is one whole pixel of background in the margin around the logo
+        self.plot_background = self.fig_background.getroot()
+        background_translation = self.middle - self.logo_box_size/2 # center the background
+        self.plot_background.moveto(background_translation, background_translation)
 
-## Combine plots into single SVG
-fig = sg.SVGFigure(qr_size*scale_factor, qr_size*scale_factor)
-fig.append([plot_qr, plot_background, plot_logo]) # Order Matters. First is lowest z-index.
-fig.save("qrcode_with_logo.svg")
+        ## Create logo plot
+        self.plot_logo = self.fig_logo.getroot()
+        logo_translation = self.middle - 7*self.scale_factor/2 # center the logo
+        # Scale to fit logo in a 7 module wide box in the center.
+        self.plot_logo.moveto(logo_translation, logo_translation, scale=7*self.scale_factor/self.logo_size)
+
+    def output_qr(self):
+        ## Combine plots into single SVG
+        fig = sg.SVGFigure(self.qr_size*self.scale_factor, self.qr_size*self.scale_factor)
+        fig.append([self.plot_qr, self.plot_background, self.plot_logo]) # Order Matters. First is lowest z-index.
+        fig.save("qrcode_with_logo.svg")
+
+    def __run__(self):
+        self.input_for_encoding()
+        self.base_qr_code()
+        self.input_logo()
+        self.config_logo()
+        self.create_plots()
+        self.output_qr()
+
+qr = QRFactory()
+qr.__run__()
