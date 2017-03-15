@@ -9,6 +9,8 @@
 # image itself. SVGs can encode image sizes in a number of ways. This
 # does not handle all ways of specifying image sizes.
 #########################################
+import io
+import StringIO
 
 import segno
 import svgutils.transform as sg
@@ -22,11 +24,12 @@ class QRFactory:
 
     def input_for_encoding(self):
         ## Create base QR Code
+        self.QRsvg = StringIO.StringIO()
         qr = segno.make('http://goo.gl/aVZvN1', micro=False, error='H')
-        qr.save('qrcode.svg', color=self.module_color, background=self.background_color)
-            # file output used here for base_qr_code
+        qr.save(self.QRsvg, color=self.module_color, background=self.background_color, kind='svg')
+        # outputting base qr code to StringIO buffer
     def base_qr_code(self):
-        self.fig_qr = sg.fromfile('qrcode.svg')
+        self.fig_qr = sg.fromstring(self.QRsvg.getvalue())
         self.qr_size = float(self.fig_qr.get_size()[0]) # only grab first size because it's a square
         self.middle = (self.qr_size*self.scale_factor)/2 # typically not an integer
 
