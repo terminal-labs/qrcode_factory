@@ -77,14 +77,6 @@ class QRFactory:
         fig.append([self.plot_qr, self.plot_background, self.plot_logo]) # Order Matters. First is lowest z-index.
         fig.save("qrcode_with_logo.svg")
 
-    def __run__(self):
-        self.input_for_encoding(to_encode='http://goo.gl/aVZvN1')
-        self.base_qr_code()
-        self.input_logo(logo=io.BytesIO(open('logo.svg').read()))
-        self.config_logo()
-        self.create_plots()
-        self.output_qr()
-
 if __name__ == '__main__':
     qr = QRFactory()
     qr.input_for_encoding(to_encode='http://goo.gl/aVZvN1')
