@@ -14,18 +14,18 @@ import StringIO
 
 import segno
 import svgutils.transform as sg
-import svgwrite
+import svgwrite ##TODO use this to replace svgutils
 
 class QRFactory:
     def __init__(self, module_color=None,background_color=None,scale_factor=None):
-        self.module_color = module_color if module_color is not None else "#000000"
-        self.background_color = background_color if background_color is not None else "#2F9A41"
-        self.scale_factor = scale_factor if scale_factor is not None else 10 # Scale so that SVG output logo isn't pixelated.
+        self.module_color = module_color if module_color else "#000000"
+        self.background_color = background_color if background_color else "#2F9A41"
+        self.scale_factor = scale_factor if scale_factor else 10 # Scale so that SVG output logo isn't pixelated.
 
-    def input_for_encoding(self):
+    def input_for_encoding(self,to_encode=None):
         ## Create base QR Code
-        self.QRsvg = StringIO.StringIO()
-        qr = segno.make('http://goo.gl/aVZvN1', micro=False, error='H')
+        self.QRsvg = io.BytesIO()
+        qr = segno.make(to_encode, micro=False, error='H')
         qr.save(self.QRsvg, color=self.module_color, background=self.background_color, kind='svg')
         # outputting base qr code to StringIO buffer
     def base_qr_code(self):
@@ -33,11 +33,15 @@ class QRFactory:
         self.qr_size = float(self.fig_qr.get_size()[0]) # only grab first size because it's a square
         self.middle = (self.qr_size*self.scale_factor)/2 # typically not an integer
 
-    def input_logo(self):
+    def input_logo(self,logo=None):
+        ## TODO assure that input is BytesIO
         ## Load image to embed
-        self.fig_logo = sg.fromfile('logo.svg')
+        print logo
+        self.fig_logo = sg.fromstring(logo.getvalue())
 
     def config_logo(self):
+        ## This method will create the small background image that goes behind the logo, effectilly a matte. We needed it for our logo
+        ## But it may not be necessary for MVP of site. Something we could add later as it is probably one of the trickyer things to generalize.
         # TODO: Following line needs to be more robust for arbitrary SVGs.
         self.logo_size = float(self.fig_logo.root.get('viewBox').split()[2]) # only grab first size because it's a square
 
@@ -74,12 +78,19 @@ class QRFactory:
         fig.save("qrcode_with_logo.svg")
 
     def __run__(self):
-        self.input_for_encoding()
+        self.input_for_encoding(to_encode='http://goo.gl/aVZvN1')
         self.base_qr_code()
-        self.input_logo()
+        self.input_logo(logo=io.BytesIO(open('logo.svg').read()))
         self.config_logo()
         self.create_plots()
         self.output_qr()
 
-qr = QRFactory()
-qr.__run__()
+if __name__ == '__main__':
+    qr = QRFactory()
+    qr.input_for_encoding(to_encode='http://goo.gl/aVZvN1')
+    qr.base_qr_code()
+    qr.input_logo(logo=io.BytesIO(open('logo.svg').read()))
+    qr.config_logo()
+    qr.create_plots()
+    qr.output_qr()
+
