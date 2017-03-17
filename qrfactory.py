@@ -25,13 +25,13 @@ class QRFactory:
 
           - **parameters**, **types**, **return** and **return types**::
 
-        :param logo: logo svg as io.BytesIO object #TODO: Change this to str later
+        :param logo: logo svg as a string
         :param to_encode: data to be encoded as a qr code
         :param module_color: color of the svg module data (lighter color usually)
         :param background_color: color of the svg module data and logo matte background (darker color usually)
         :param scale_factor: Resolition to upscale the qrcode to so that the logo doesn't look pixelated by contrast
         :param outfile: name of final svg file to produce
-        :type logo: io.BytesIO object #TODO: Change this to str later
+        :type logo: str
         :type to_encode: str
         :type module_color: str
         :type background_color: str
@@ -64,8 +64,7 @@ class QRFactory:
 
     def input_logo(self,logo):
         ## Load image to embed
-        ## TODO convert logo of type str to BytesIO here.
-        self.fig_logo = sg.fromstring(logo.getvalue())
+        self.fig_logo = sg.fromstring(logo)
 
     def config_logo(self):
         ## This method will create the small background image that goes behind the logo, effectilly a matte. We needed it for our logo
@@ -108,7 +107,7 @@ class QRFactory:
 
 if __name__ == '__main__':
     ##TODO: allow for inputting data via command args instead of hardcoded defaults.
-    logo = io.BytesIO(open("logo.svg").read())
+    logo = open("logo.svg").read()
     to_encode = "http://goo.gl/aVZvN1"
     qr = QRFactory(logo, to_encode, background_color="#2F9A41")
     open("qrcode_with_logo.svg", "w+").write(qr.output_qr())
