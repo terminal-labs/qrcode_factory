@@ -22,7 +22,7 @@ class QRFactory:
         self.background_color = background_color if background_color else "#2F9A41"
         self.scale_factor = scale_factor if scale_factor else 10 # Scale so that SVG output logo isn't pixelated.
 
-    def input_for_encoding(self,to_encode=None):
+    def input_for_encoding(self,to_encode):
         ## Create base QR Code
         self.QRsvg = io.BytesIO()
         qr = segno.make(to_encode, micro=False, error='H')
@@ -36,7 +36,6 @@ class QRFactory:
     def input_logo(self,logo=None):
         ## TODO assure that input is BytesIO
         ## Load image to embed
-        print logo
         self.fig_logo = sg.fromstring(logo.getvalue())
 
     def config_logo(self):
@@ -77,18 +76,35 @@ class QRFactory:
         fig.append([self.plot_qr, self.plot_background, self.plot_logo]) # Order Matters. First is lowest z-index.
         return fig
 
-def main(outfile=None):
+def main(logo, to_encode, outfile=None):
+    '''Create a qrcode with a logo.
+
+    Encode data  as an svg and overlay a logo with a matte backdrop on
+    top of it to produce a final qr code svg with a logo.
+
+      - **parameters**, **types**, **return** and **return types**::
+
+    :param logo: logo svg as io.BytesIO object
+    :param to_encode: data to be encoded as a qr code
+    :param outfile: name of final svg file to produce
+    :type logo: io.BytesIO object
+    :type to_encode: str
+    :type outfile: str
+    :return: Final svg as string if imported, None if ran from shell
+    :rtype: str if imported, None if ran from the shell
+    '''
     qr = QRFactory()
-    qr.input_for_encoding(to_encode='http://goo.gl/aVZvN1')
+    qr.input_for_encoding(to_encode=to_encode)
     qr.base_qr_code()
-    qr.input_logo(logo=io.BytesIO(open('logo.svg').read()))
+    qr.input_logo(logo)
     qr.config_logo()
     qr.create_plots()
     fig = qr.output_qr()
     if outfile:
-        fig.save("qrcode_with_logo.svg") # save file when called via shell
+        fig.save(outfile) # save file when called via shell
     else:
         return fig.to_str() # return svg as string for general use
 
 if __name__ == '__main__':
-    main("qrcode_with_logo.svg")
+    logo = io.BytesIO(open("logo.svg").read())
+    main(logo, "http://goo.gl/aVZvN1", "qrcode_with_logo.svg")
