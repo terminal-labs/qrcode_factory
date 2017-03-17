@@ -25,11 +25,17 @@ class QRFactory:
 
           - **parameters**, **types**, **return** and **return types**::
 
-        :param logo: logo svg as io.BytesIO object
+        :param logo: logo svg as io.BytesIO object #TODO: Change this to str later
         :param to_encode: data to be encoded as a qr code
+        :param module_color: color of the svg module data (lighter color usually)
+        :param background_color: color of the svg module data and logo matte background (darker color usually)
+        :param scale_factor: Resolition to upscale the qrcode to so that the logo doesn't look pixelated by contrast
         :param outfile: name of final svg file to produce
-        :type logo: io.BytesIO object
+        :type logo: io.BytesIO object #TODO: Change this to str later
         :type to_encode: str
+        :type module_color: str
+        :type background_color: str
+        :type scale_factor: int
         :type outfile: str
         :return: Final svg as string if imported, None if ran from shell
         :rtype: str if imported, None if ran from the shell
@@ -56,9 +62,9 @@ class QRFactory:
         self.qr_size = float(self.fig_qr.get_size()[0]) # only grab first size because it's a square
         self.middle = (self.qr_size*self.scale_factor)/2 # typically not an integer
 
-    def input_logo(self,logo=None):
-        ## TODO assure that input is BytesIO
+    def input_logo(self,logo):
         ## Load image to embed
+        ## TODO convert logo of type str to BytesIO here.
         self.fig_logo = sg.fromstring(logo.getvalue())
 
     def config_logo(self):
