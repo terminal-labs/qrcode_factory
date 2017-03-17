@@ -74,10 +74,9 @@ class QRFactory:
 
         ## Create embedded image's solid background. It will provide a 1 module ("pixel") wide margin in all directions.
         self.logo_box_size = 9*self.scale_factor # must represent an odd number of modules since qr code lengths are odd modules long.
-        fig_background = svgwrite.Drawing('background.svg', size=(self.logo_box_size, self.logo_box_size))
+        fig_background = svgwrite.Drawing(filename='noname.svg', size=(self.logo_box_size, self.logo_box_size))
         fig_background.add(fig_background.rect(insert=(0,0), size=(self.logo_box_size, self.logo_box_size), fill=self.module_color))
-        fig_background.save()
-        self.fig_background = sg.fromfile('background.svg')
+        self.fig_background = sg.fromstring(fig_background.tostring()) # patch data from svgwrite to svgutils
 
     def create_plots(self):
         ### Creating plots to be combined into final SVG
