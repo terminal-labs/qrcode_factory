@@ -101,7 +101,7 @@ class QRFactory:
         ## Combine plots into single SVG
         fig = sg.SVGFigure(self.qr_size*self.scale_factor, self.qr_size*self.scale_factor)
         fig.append([self.plot_qr, self.plot_background, self.plot_logo]) # Order Matters. First is lowest z-index.
-        return fig.to_str() # Can only saved to a file or be cast into a string
+        return fig.to_str() # Can only save to a file or be cast into a string
 
 
 if __name__ == '__main__':
