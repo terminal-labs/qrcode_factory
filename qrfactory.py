@@ -44,10 +44,6 @@ class QRFactory:
         self.config_logo()
         self.create_plots()
         self.output_qr()
-        # if outfile:
-        #     fig.save(outfile) # save file when called via shell
-        # else:
-        #     return fig.to_str() # return svg as string for general use
 
     def input_for_encoding(self, to_encode):
         ## Create base QR Code
