@@ -17,12 +17,39 @@ import svgutils.transform as sg
 import svgwrite ##TODO use this to replace svgutils
 
 class QRFactory:
-    def __init__(self, module_color=None,background_color=None,scale_factor=None):
-        self.module_color = module_color if module_color else "#000000"
-        self.background_color = background_color if background_color else "#2F9A41"
-        self.scale_factor = scale_factor if scale_factor else 10 # Scale so that SVG output logo isn't pixelated.
+    def __init__(self, logo, to_encode, module_color="#000000", background_color="#FFFFFF", scale_factor=10, outfile=None):
+        '''Create a qrcode with a logo.
 
-    def input_for_encoding(self,to_encode):
+        Encode data  as an svg and overlay a logo with a matte backdrop on
+        top of it to produce a final qr code svg with a logo.
+
+          - **parameters**, **types**, **return** and **return types**::
+
+        :param logo: logo svg as io.BytesIO object
+        :param to_encode: data to be encoded as a qr code
+        :param outfile: name of final svg file to produce
+        :type logo: io.BytesIO object
+        :type to_encode: str
+        :type outfile: str
+        :return: Final svg as string if imported, None if ran from shell
+        :rtype: str if imported, None if ran from the shell
+        '''
+        self.module_color = module_color
+        self.background_color = background_color
+        self.scale_factor = scale_factor
+
+        self.input_for_encoding(to_encode)
+        self.base_qr_code()
+        self.input_logo(logo)
+        self.config_logo()
+        self.create_plots()
+        self.output_qr()
+        # if outfile:
+        #     fig.save(outfile) # save file when called via shell
+        # else:
+        #     return fig.to_str() # return svg as string for general use
+
+    def input_for_encoding(self, to_encode):
         ## Create base QR Code
         self.QRsvg = io.BytesIO()
         qr = segno.make(to_encode, micro=False, error='H')
@@ -74,37 +101,12 @@ class QRFactory:
         ## Combine plots into single SVG
         fig = sg.SVGFigure(self.qr_size*self.scale_factor, self.qr_size*self.scale_factor)
         fig.append([self.plot_qr, self.plot_background, self.plot_logo]) # Order Matters. First is lowest z-index.
-        return fig
+        return fig.to_str() # Can only saved to a file or be cast into a string
 
-def main(logo, to_encode, outfile=None):
-    '''Create a qrcode with a logo.
-
-    Encode data  as an svg and overlay a logo with a matte backdrop on
-    top of it to produce a final qr code svg with a logo.
-
-      - **parameters**, **types**, **return** and **return types**::
-
-    :param logo: logo svg as io.BytesIO object
-    :param to_encode: data to be encoded as a qr code
-    :param outfile: name of final svg file to produce
-    :type logo: io.BytesIO object
-    :type to_encode: str
-    :type outfile: str
-    :return: Final svg as string if imported, None if ran from shell
-    :rtype: str if imported, None if ran from the shell
-    '''
-    qr = QRFactory()
-    qr.input_for_encoding(to_encode=to_encode)
-    qr.base_qr_code()
-    qr.input_logo(logo)
-    qr.config_logo()
-    qr.create_plots()
-    fig = qr.output_qr()
-    if outfile:
-        fig.save(outfile) # save file when called via shell
-    else:
-        return fig.to_str() # return svg as string for general use
 
 if __name__ == '__main__':
+    ##TODO: allow for inputting data via command args instead of hardcoded defaults.
     logo = io.BytesIO(open("logo.svg").read())
-    main(logo, "http://goo.gl/aVZvN1", "qrcode_with_logo.svg")
+    to_encode = "http://goo.gl/aVZvN1"
+    qr = QRFactory(logo, to_encode, background_color="#2F9A41")
+    open("qrcode_with_logo.svg", "w+").write(qr.output_qr())
