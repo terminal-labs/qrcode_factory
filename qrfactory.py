@@ -75,14 +75,20 @@ class QRFactory:
         ## Combine plots into single SVG
         fig = sg.SVGFigure(self.qr_size*self.scale_factor, self.qr_size*self.scale_factor)
         fig.append([self.plot_qr, self.plot_background, self.plot_logo]) # Order Matters. First is lowest z-index.
-        fig.save("qrcode_with_logo.svg")
+        return fig
 
-if __name__ == '__main__':
+def main(outfile=None):
     qr = QRFactory()
     qr.input_for_encoding(to_encode='http://goo.gl/aVZvN1')
     qr.base_qr_code()
     qr.input_logo(logo=io.BytesIO(open('logo.svg').read()))
     qr.config_logo()
     qr.create_plots()
-    qr.output_qr()
+    fig = qr.output_qr()
+    if outfile:
+        fig.save("qrcode_with_logo.svg") # save file when called via shell
+    else:
+        return fig.to_str() # return svg as string for general use
 
+if __name__ == '__main__':
+    main("qrcode_with_logo.svg")
