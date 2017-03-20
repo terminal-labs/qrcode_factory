@@ -82,8 +82,11 @@ class QRFactory:
     def create_plots(self): #TODO: Not sure this method and output_qr should be separate. Consider condsolidating.
         ### Creating plots to be combined into final SVG
         ## Create QR code plot
-        self.plot_qr = self.fig_qr.getroot()
-        self.plot_qr.moveto(0, 0, scale=self.scale_factor)
+        if self.fig_qr:
+            self.plot_qr = self.fig_qr.getroot()
+            self.plot_qr.moveto(0, 0, scale=self.scale_factor)
+        else: # TODO: Put some warning here. What can we do without first making a fig_qr?
+            pass
 
         ## Create background plot
         if (self.fig_logo and self.fig_background): # if no logo is set, don't embed one (or it's background)
