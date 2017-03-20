@@ -29,13 +29,11 @@ class QRFactory:
         :param module_color: color of the svg module data (lighter color usually)
         :param background_color: color of the svg module data and logo matte background (darker color usually)
         :param scale_factor: Resolition to upscale the qrcode to so that the logo doesn't look pixelated by contrast
-        :param outfile: name of final svg file to produce
         :type logo: str
         :type to_encode: str
         :type module_color: str
         :type background_color: str
         :type scale_factor: int
-        :type outfile: str
         :return: Final svg as string if imported, None if ran from shell
         :rtype: str if imported, None if ran from the shell
         '''
