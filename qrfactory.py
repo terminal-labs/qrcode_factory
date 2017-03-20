@@ -16,7 +16,7 @@ import svgutils.transform as sg
 import svgwrite ##TODO use this to replace svgutils
 
 class QRFactory:
-    def __init__(self, logo=None, to_encode=None, module_color="#000000", background_color="#FFFFFF", scale_factor=10, outfile=None):
+    def __init__(self, logo=None, to_encode=None, module_color="#000000", background_color="#FFFFFF", scale_factor=10):
         '''Create a qrcode with a logo.
 
         Encode data  as an svg and overlay a logo with a matte backdrop on
@@ -61,14 +61,21 @@ class QRFactory:
         self.middle = (self.qr_size*self.scale_factor)/2 # typically not an integer
 
     def logo(self, logo):
-        ## This method will create the small background image that goes behind the logo, effectilly a matte. We needed it for our logo
-        ## But it may not be necessary for MVP of site. Something we could add later as it is probably one of the trickyer things to generalize.
-        # TODO: Following line needs to be more robust for arbitrary SVGs.
+        ## This method will create the small background image that goes
+        ## behind the logo, effectilly a matte. We needed it for our logo
+        ## but it may not be necessary for MVP of site. Something we
+        ## could add later as it is probably one of the trickyer things
+        ## to generalize.
+
+
         ## Load image to embed
+        # TODO: Surround this line with a try/except to prove the sting is a n SVG (XMLSyntaxError?)
         self.fig_logo = sg.fromstring(logo)
+        # TODO: Following line needs to be more robust for arbitrary SVGs.
         self.logo_size = float(self.fig_logo.root.get('viewBox').split()[2]) # only grab first size because it's a square
 
-        ## Create embedded image's solid background. It will provide a 1 module ("pixel") wide margin in all directions.
+        ## Create embedded image's solid background. It will provide
+        ## a 1 module ("pixel") wide margin in all directions.
         self.logo_box_size = 9*self.scale_factor # must represent an odd number of modules since qr code lengths are odd modules long.
         fig_background = svgwrite.Drawing(filename='noname.svg', size=(self.logo_box_size, self.logo_box_size))
         fig_background.add(fig_background.rect(insert=(0,0), size=(self.logo_box_size, self.logo_box_size), fill=self.module_color))
