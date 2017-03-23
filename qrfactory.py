@@ -10,6 +10,7 @@
 # does not handle all ways of specifying image sizes.
 #########################################
 import io
+import copy # to fix bug where fig_qr seems corrupted by fig_qr.getroot()
 
 import segno
 import svgutils.transform as sg
@@ -52,13 +53,15 @@ class QRFactory:
     def build_qrcode(self, to_encode):
         '''Create base QR Code'''
         print "to_encode = ", to_encode
+        print
         self.to_encode = to_encode
         self.QRsvg = io.BytesIO()
         self.qr = segno.make(self.to_encode, micro=False, error='H')
         # saving base qr code to StringIO buffer
         self.qr.save(self.QRsvg, color=self.module_color, background=self.background_color, kind='svg')
         self.fig_qr = sg.fromstring(self.QRsvg.getvalue())
-        self.qr_size = float(self.fig_qr.get_size()[0]) # only grab first size because it's a square
+        self.x = copy.copy(self.fig_qr)
+        self.qr_size = float(self.x.get_size()[0]) # only grab first size because it's a square
         self.middle = (self.qr_size*self.scale_factor)/2 # typically not an integer
 
     def build_logo(self, logo):
@@ -69,11 +72,14 @@ class QRFactory:
         to generalize.
         '''
         self.logo = logo
+        print "logo = ", logo
         ## Load image to embed
         # TODO: Surround this line with a try/except to prove the sting is an SVG (XMLSyntaxError?)
         self.fig_logo = sg.fromstring(self.logo)
+        self.y = copy.copy(self.fig_logo)
+        print "fig_logo = ", self.fig_logo.to_str()
         # TODO: Following line needs to be more robust for arbitrary SVGs.
-        self.logo_size = float(self.fig_logo.root.get('viewBox').split()[2]) # only grab first size because it's a square
+        self.logo_size = float(self.y.root.get('viewBox').split()[2]) # only grab first size because it's a square
 
         ## Create embedded image's solid background. It will provide
         ## a 1 module ("pixel") wide margin in all directions.
@@ -85,7 +91,14 @@ class QRFactory:
     def _create_plots_qr(self):
         '''Creating qr plot for final SVG'''
         print "in _create_plots_qr"
-        self.plot_qr = self.fig_qr.getroot()
+        print "self.plot_qr0 = ", self.plot_qr if hasattr(self, 'plot_qr') else None
+        print "x = ", self.x.to_str()
+        print "figqr = ", self.fig_qr.to_str()
+        print "self.fig_qr.to_str()0 = ", self.fig_qr.to_str() if hasattr(self, 'fig_qr') else None
+#        x = self.fig_qr
+        self.plot_qr = self.x.getroot()
+        print "self.plot_qr1 = ", self.plot_qr if hasattr(self, 'plot_qr') else None
+        print "self.fig_qr.to_str()1 = ", self.fig_qr.to_str() if hasattr(self, 'fig_qr') else None
         self.plot_qr.moveto(0, 0, scale=self.scale_factor)
 
     def _create_plots_logo(self):
@@ -98,13 +111,14 @@ class QRFactory:
         self.plot_background.moveto(background_translation, background_translation)
 
         ## Create logo plot
-        self.plot_logo = self.fig_logo.getroot()
+        self.plot_logo = self.y.getroot()
         logo_translation = self.middle - 7*self.scale_factor/2 # center the logo
         # Scale to fit logo in a 7 module wide box in the center.
         self.plot_logo.moveto(logo_translation, logo_translation, scale=7*self.scale_factor/self.logo_size)
 
     def output_qr(self):
         '''Combine plots into single SVG'''
+        print "################# output_pr #####################"
         try:
             self._create_plots_qr()
         except AttributeError as e: # We never got data to encode, and never produced a qrcode. Nothing to ouput.
@@ -117,6 +131,8 @@ class QRFactory:
             fig.append([self.plot_qr, self.plot_background, self.plot_logo]) # Order Matters. First is lowest z-index.
         except AttributeError as e: # We never got a logo svg, just ouput a qr code.
             fig.append(self.plot_qr) # Just a qr code
+        print "%%%%%%% final output %%%%%%"
+        print fig.to_str()
         return fig.to_str() # Can only save to a file or be cast into a string
 
 
