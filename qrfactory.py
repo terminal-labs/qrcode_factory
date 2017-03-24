@@ -50,9 +50,21 @@ class QRFactory:
         if logo is not None and to_encode is not None: # Save logo data
             self.build_logo(self.logo)
 
-    def build_qrcode(self, to_encode):
+    def build_qrcode(self, to_encode=None, module_color=None, background_color=None, scale_factor=None):
         '''Create base QR Code'''
-        self.to_encode = to_encode
+        if not (self.to_encode or to_encode): # If we have no data, we can't do anything.
+            return
+
+        # If any data has changed, save it.
+        if to_encode:
+            self.to_encode = to_encode
+        if module_color:
+            self.module_color = module_color
+        if background_color:
+            self.background_color = background_color
+        if scale_factor:
+            self.scale_factor = scale_factor
+        
         self.QRsvg = io.BytesIO()
         self.qr = segno.make(self.to_encode, micro=False, error='H')
         # saving base qr code to StringIO buffer
@@ -73,7 +85,7 @@ class QRFactory:
         # TODO: Surround this line with a try/except to prove the sting is an SVG (XMLSyntaxError?)
         self.fig_logo = sg.fromstring(self.logo)
         # TODO: Following line needs to be more robust for arbitrary SVGs.
-        self.logo_size = float(self.fig_logo.root.get('viewBox').split()[2]) # only grab first size because it's a square
+        self.logo_size = self._svg_size(self.fig_logo)
 
         ## Create embedded image's solid background. It will provide
         ## a 1 module ("pixel") wide margin in all directions.
@@ -81,6 +93,20 @@ class QRFactory:
         fig_background = svgwrite.Drawing(filename='noname.svg', size=(self.logo_box_size, self.logo_box_size))
         fig_background.add(fig_background.rect(insert=(0,0), size=(self.logo_box_size, self.logo_box_size), fill=self.module_color))
         self.fig_background = sg.fromstring(fig_background.tostring()) # patch data from svgwrite to svgutils
+
+    def _svg_size(self, svg):
+        # Look for a hieght and width, and return the larger of the two.
+        if svg.root.get('viewBox'):
+            view = 'viewBox'
+        elif svg.root.get('viewbox'):
+            view = 'viewbox'
+        else:
+            view = False
+        if view:
+            width = float(svg.root.get(view).split()[2])
+            height = float(svg.root.get(view).split()[3])
+        size = max(width, height)
+        return size
 
     def _create_plots_qr(self):
         '''Creating qr plot for final SVG'''
