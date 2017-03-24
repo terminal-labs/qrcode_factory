@@ -87,7 +87,7 @@ class QRFactory:
         # deepcopy used to fix bug where svgutil clobbers contents on getroot
         local_fig_qr = copy.deepcopy(self.fig_qr) # copy fig
         self.plot_qr = self.fig_qr.getroot()
-        self.fig_qr = copy.deepcopy(local_fig_qr) # reset fig after clobbering
+        self.fig_qr = local_fig_qr # reset fig after clobbering
         self.plot_qr.moveto(0, 0, scale=self.scale_factor)
 
     def _create_plots_logo(self):
@@ -98,7 +98,7 @@ class QRFactory:
         # deepcopy used to fix bug where svgutil clobbers contents on getroot.
         local_fig_background = copy.deepcopy(self.fig_background) # copy fig
         self.plot_background = self.fig_background.getroot()
-        self.fig_background = copy.deepcopy(local_fig_background) # reset fig after clobbering
+        self.fig_background = local_fig_background # reset fig after clobbering
         background_translation = self.middle - self.logo_box_size/2 # center the background
         self.plot_background.moveto(background_translation, background_translation)
 
@@ -106,7 +106,7 @@ class QRFactory:
         # deepcopy used to fix bug where svgutil clobbers contents on getroot
         local_fig_logo = copy.deepcopy(self.fig_logo) # copy fig
         self.plot_logo = self.fig_logo.getroot()
-        self.fig_logo = copy.deepcopy(local_fig_logo) # reset fig after clobbering
+        self.fig_logo = local_fig_logo # reset fig after clobbering
         logo_translation = self.middle - 7*self.scale_factor/2 # center the logo
         # Scale to fit logo in a 7 module wide box in the center.
         self.plot_logo.moveto(logo_translation, logo_translation, scale=7*self.scale_factor/self.logo_size)
