@@ -2,4 +2,4 @@ segno
 svgutils
 svgwrite
 colour-runner
-nose
+ipdb

@@ -56,6 +56,7 @@ class TestQRFactoryMethods(TestCase):
 
     def test_multiple_outputs_inputs(self):
         '''Test that multiple outputs and inputs don't change the result'''
+        # Maybe went overboard with this one because of bug in svgutils -_-
         qr = qrfactory.QRFactory()
         qr.build_logo(open("logo.svg").read())
         qr.build_qrcode("asdfasdfas")
@@ -69,6 +70,7 @@ class TestQRFactoryMethods(TestCase):
         qr.build_logo(open("logo.svg").read())
         self.assertEqual(test_vars.test_qr_and_logo, qr.output_qr())
         qr.build_logo(open("logo.svg").read())
+        self.assertEqual(test_vars.test_qr_and_logo, qr.output_qr())
         self.assertEqual(test_vars.test_qr_and_logo, qr.output_qr())
         
 if __name__ == '__main__':
