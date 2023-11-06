@@ -26,7 +26,7 @@ This is not compatible with Python 3.12 at this time.
 python qrfactory.py
 ```
 
-Will run, out of the box, and generate a readable QR code with the TL logo in the center, pointing to a shortened url that forwards to terminallabs.com.
+The above will run out of the box, and generate a readable QR code with the TL logo in the center, pointing to a shortened url that forwards to terminallabs.com.
 
 To customize this, you can:
 
