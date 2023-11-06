@@ -31,7 +31,7 @@ Will run, out of the box, and generate a readable QR code with the TL logo in th
 To customize this, you can:
 
 - swap out the logo for any other square svg
-- change the data that's encoded into the QR code, currently living at `to_encode = "http://goo.gl/aVZvN1"` in the script
+- change the data that's encoded into the QR code, currently living at `to_encode = "trml.io"` in the script
 - change the background color, currently living at `background_color = "#2F9A41"`
 
 Note that the longer the encoded string is, the more complex the QR code is.
