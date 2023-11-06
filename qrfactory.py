@@ -64,7 +64,7 @@ class QRFactory:
             self.background_color = background_color
         if scale_factor:
             self.scale_factor = scale_factor
-        
+
         self.QRsvg = io.BytesIO()
         self.qr = segno.make(self.to_encode, micro=False, error='H')
         # saving base qr code to StringIO buffer
@@ -72,6 +72,7 @@ class QRFactory:
         self.fig_qr = sg.fromstring(self.QRsvg.getvalue())
         self.qr_size = float(self.fig_qr.get_size()[0]) # only grab first size because it's a square
         self.middle = (self.qr_size*self.scale_factor)/2 # typically not an integer
+        # print(self.qr_size)
 
     def build_logo(self, logo):
         '''This method will create the small background image that goes
@@ -83,7 +84,7 @@ class QRFactory:
         self.logo = logo
         ## Load image to embed
         # TODO: Surround this line with a try/except to prove the sting is an SVG (XMLSyntaxError?)
-        self.fig_logo = sg.fromstring(self.logo)
+        self.fig_logo = sg.fromstring(self.logo.encode())
         # TODO: Following line needs to be more robust for arbitrary SVGs.
         self.logo_size = self._svg_size(self.fig_logo)
 
@@ -157,7 +158,10 @@ class QRFactory:
 if __name__ == '__main__':
     '''Build a qrcode with a logo inside it'''
     ##TODO: allow for inputting data via command args instead of hardcoded defaults.
-    logo = open("logo.svg").read()
-    to_encode = "http://goo.gl/aVZvN1"
-    qrcode = QRFactory(logo, to_encode, background_color="#2F9A41")
-    open("qrcode_with_logo.svg", "w+").write(qrcode.output_qr())
+    with open("logo.svg") as fp:
+        logo = fp.read()
+    to_encode = "trml.io"
+    background_color = "#2F9A41"
+    qrcode = QRFactory(logo, to_encode, background_color=background_color)
+    with open("qrcode_with_logo.svg", "wb") as fp:
+        fp.write(qrcode.output_qr())

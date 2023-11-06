@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from unittest import TestCase, TestLoader, TextTestRunner
 
-from colour_runner import runner
 
 import test_vars
 import qrfactory
@@ -17,6 +16,7 @@ class TestQRFactoryMethods(TestCase):
         '''Test output with only qr data'''
         qr = qrfactory.QRFactory()
         qr.build_qrcode("asdfasdfas", "red", "yellow", 5)
+        breakpoint()
         self.assertEqual(test_vars.test_qr_full, qr.output_qr())
 
     def test_logo_first(self):
@@ -72,7 +72,7 @@ class TestQRFactoryMethods(TestCase):
         qr.build_logo(test_vars.logo)
         self.assertEqual(test_vars.test_qr_and_logo, qr.output_qr())
         self.assertEqual(test_vars.test_qr_and_logo, qr.output_qr())
-        
+
 if __name__ == '__main__':
     suite = TestLoader().loadTestsFromTestCase(TestQRFactoryMethods)
-    runner.ColourTextTestRunner(verbosity=2).run(suite)
+    TextTestRunner().run(suite)

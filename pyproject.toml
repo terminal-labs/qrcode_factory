@@ -1,0 +1,28 @@
+[project]
+name = "qrcode-factory"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Joseph Nix", email = "nixjdm@terminallabs.com" }
+]
+dependencies = [
+    "segno==0.2.5",
+    "svgutils==0.2.0",
+    "svgwrite==1.1.10",
+    "lxml==4.9.3",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "ipdb>=0.13.13",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
